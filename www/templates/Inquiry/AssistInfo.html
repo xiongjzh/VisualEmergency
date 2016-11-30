@@ -1,77 +1,109 @@
-
-
-<label style="position:relative;left:950px">
-  <div class="input-label">
-    选择医嘱状态
+<div class="col-lg-10 col-lg-offset-1">
+  <div class="col-lg-4" style="float:right;padding-bottom:5px;text-align:right">
+    <b>选择医嘱状态: </b>
+    <button class="btn btn-success  dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"  style="margin-right:40px;width:80px">
+    {{item}}
+    <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+      <li ng-click="orderingsfilter('','全部')"><a href="#/Inquiry/Assist">全部</a></li>
+      <li ng-click="orderingsfilter(1,'已保存')"><a href="#/Inquiry/Assist">已保存</a></li>
+      <li ng-click="orderingsfilter(2,'已提交')"><a href="#/Inquiry/Assist">已提交</a></li>
+      <li ng-click="orderingsfilter(3,'已确认')"><a href="#/Inquiry/Assist">已确认</a></li>
+      <li ng-click="orderingsfilter(4,'已执行')"><a href="#/Inquiry/Assist">已执行</a></li>
+      <li ng-click="orderingsfilter(10,'作废')"><a href="#/Inquiry/Assist">作废</a></li>
+    </ul>
+    <b>搜 索:</b> <input ng-model="query"/>
   </div>
-  <select ng-model="Status" ng-options="value for value in values" ng-change="changeStatus()" style="width:90px;height:25px">
-  </select>
 
-</label>
-<div id="tableContainer" class="tableContainer">
-    <table width="100%" cellspacing="0" cellpadding="0" border="0" class="scrollTable table-striped">
-      <thead class="orderings_fixedHeader">
-        <tr>
-          <th></th>
-          <th>患者ID</th>
-          <th>姓名</th>
-          <th>医嘱名称</th>
-          <th>医嘱状态</th>
-          <th>申请科室</th>
-          <th>目标科室</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody class="orderings_scrollContent">
-        <tr ng-repeat="ordering in orderings">
-          <td>
-            <a href=""><img src="image/loc.jpg"></a>
-          </td>
-          <td>{{ordering.PatientId}}</td>
-          <td>{{ordering.PatientName}}</td>
-          <td>{{ordering.OrderName}}</td>
-          <td>{{ordering.Status}}</td>
-          <td>{{ordering.ApplyDepartment}}</td>
-          <td>{{ordering.TargetDepartment}}</td>
-          <td>
-            <input type="button"  data-toggle="modal" data-target="#mymodal1" value="查看生理信息" class="btn btn-primary editBtn" href=""/>
-            <div class="modal" id="mymodal1">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title">标题</h4>
-                  </div>
-                  <div class="modal-body">
-                    <p>生理信息</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">保存</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <input type="button" data-toggle="modal" data-target="#mymodal2" value="查看生化信息" class="btn btn-primary editBtn" href=""/>
-            <div class="modal" id="mymodal2">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title">标题</h4>
-                  </div>
-                  <div class="modal-body">
-                    <p>生化信息</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                    <button type="button" class="btn btn-primary">保存</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div id="tableContainer" class="tableContainer">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" class="scrollTable table-striped">
+        <thead class="orderings_fixedHeader">
+          <tr>
+            <th>患者ID</th>
+            <th>姓名</th>
+            <th>医嘱名称</th>
+            <th>医嘱状态</th>
+            <th>申请科室</th>
+            <th>目标科室</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody class="orderings_scrollContent">
+          <tr ng-repeat="ordering in orderings|filter:query">
+            <td>{{ordering.PatientId}}</td>
+            <td>{{ordering.PatientName}}</td>
+            <td>{{ordering.OrderName}}</td>
+            <td><div my-orderingstatus="{{ordering.Status}}"></div></td>
+            <td><div my-orderingdept="{{ordering.ApplyDepartment}}"></div></td>
+            <td>{{ordering.TargetDepartment}}</td>
+            <td>
+              <input type="button"  data-toggle="modal" data-target="#ViewPatientDetails" value="生理信息" class="btn btn-primary editBtn" style="margin-right:10px;height:40px" ng-click = "readPatientDetails(ordering.PatientId)"/>
+              <input type="button" data-toggle="modal" data-target="#ViewPatientBios" value="生化信息" class="btn btn-primary editBtn" style="height:40px" ng-click = "readPatientBios(ordering.PatientId)"/>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+  <!-- 生理参数信息模态框（Modal） -->
+  <div class="modal fade modal-large-font" id="ViewPatientDetails">
+     <div class="modal-dialog">
+        <div class="modal-content">
+           <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" 
+                 aria-hidden="true">×
+              </button>
+              <h4 class="modal-title" id="myModalLabel">
+                 生理参数信息
+              </h4>
+           </div>
+           <div class="modal-body">
+              <table width="100%" cellspacing="0" cellpadding="0" border="0" class="scrollTable table-striped">
+                <tbody>
+                  <tr> <td>血氧饱和度： {{PatientDetails.Oxygen}}</td> </tr>
+                  <tr> <td>脉搏： {{PatientDetails.Pulse}}</td> </tr>
+                  <tr> <td>心率： {{PatientDetails.HeartRate}}</td> </tr>
+                  <tr> <td>呼吸： {{PatientDetails.Breath}}</td> </tr>
+                  <tr> <td>神智： {{PatientDetails.Consciousness}}</td> </tr>
+                  <tr> <td>血压： {{PatientDetails.DBP}}，{{PatientDetails.SBP}}</td> </tr>
+                  <tr> <td>体温： {{PatientDetails.Temperature}}</td> </tr>
+                </tbody>
+              </table>
+           </div>
+           <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+              </button>
+           </div>
+        </div>
+     </div>
+  </div>  
+
+  <!-- 生化参数信息模态框（Modal） -->
+  <div class="modal fade modal-large-font" id="ViewPatientBios">
+     <div class="modal-dialog">
+        <div class="modal-content">
+           <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" 
+                 aria-hidden="true">×
+              </button>
+              <h4 class="modal-title" id="myModalLabel">
+                 生化参数信息
+              </h4>
+           </div>
+           <div class="modal-body">
+              <table width="100%" cellspacing="0" cellpadding="0" border="0" class="scrollTable table-striped">
+                <tbody>
+                  <tr ng-repeat="item in PatientBios">
+                    <td>{{item.type}}： {{item.value}}</td>
+                  </tr>
+                </tbody>
+              </table>
+           </div>
+           <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+              </button>
+           </div>
+        </div>
+     </div>
+  </div>              
 </div>

@@ -1,14 +1,13 @@
 'use strict';
 
-angular.module('VisualEmergency',['ui.router','controllers','services','filters','directives'])
+angular.module('VisualEmergency',['ui.router','controllers','services','directives'])
 
 .config(['$stateProvider','$urlRouterProvider',function($stateProvider,$urlRouterProvider){
   $urlRouterProvider.otherwise("/home");
   $stateProvider
     .state('home',{
       url:"/home",
-      templateUrl:"templates/home.html",
-      controller:"homeCtrl"
+      templateUrl:"templates/home.html"
     })
     .state('deliver',{
       url:"/deliver",
@@ -17,14 +16,12 @@ angular.module('VisualEmergency',['ui.router','controllers','services','filters'
     })
     .state('deliverRoom',{
       url:"/deliver/:place",
-      //templateUrl:"templates/deliverRoomDetail.html",
       templateUrl:function($stateParams){
         if($stateParams.place!='RescueStaffDistribution')
           return "templates/deliverRoomDetail.html";
         else
           return "templates/deliverRescueStaffDistribution.html";
       },
-      //controller:"deliverRoomCtrl",
       controllerProvider:function($stateParams){
         if($stateParams.place!='RescueStaffDistribution')
           return 'deliverRoomCtrl';
@@ -118,8 +115,12 @@ angular.module('VisualEmergency',['ui.router','controllers','services','filters'
 
 
 }])
-.run(['$rootScope','$stateParams',function($rootScope,$stateParams){
-  $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){       
+.run(['$rootScope','$stateParams','$interval',function($rootScope,$stateParams,$interval){
+  $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
+    $interval.cancel($rootScope.timer);
+    $interval.cancel($rootScope.timer2);
+    $interval.cancel($rootScope.tableTimer);
+    $interval.cancel($rootScope.tableTimer2);
     $("ul.nav li").removeClass('active');
     switch(toState.url.substr(1,4)){
       case 'deli':$('li#deli').addClass('active');break;
@@ -129,11 +130,11 @@ angular.module('VisualEmergency',['ui.router','controllers','services','filters'
       default:$('li#anal').addClass('active');break;
     }
     var subHeader_dict={
-      OperationRoom:'手术室实时情况',
-      ICURoom:'ICU实时情况',
-      CommonRoom:'普通病房实时情况',
-      BurnRoom:'烧伤病房实时情况',
-      SeriousInjuredRoom:'重伤病房实时情况',
+      Dept01:'手术室实时情况',
+      Dept03:'ICU实时情况',
+      Dept05:'普通病房实时情况',
+      Dept04:'烧伤病房实时情况',
+      Dept02:'重伤病房实时情况',
       OutPatientRoom:'门诊实时情况',
       RescueStaffDistribution:'救治人员分布实时情况'
     }
@@ -164,4 +165,5 @@ angular.module('VisualEmergency',['ui.router','controllers','services','filters'
       default:$rootScope.subHeader='';break;
     }
   })
+  $rootScope.GIS=window.open("/haizong/haizong-webgis/gis.html","","",true);
 }])
